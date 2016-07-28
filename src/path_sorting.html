@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>AdsumWebMap : sort paths</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+    html,
+    body {
+        font-family: Monospace;
+        background-color: #f0f0f0;
+        height: 100%;
+        width: 100%;
+    }
+    
+    #adsum-web-map-container {
+        height: 100%;
+        width: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="adsum-web-map-container"></div>
+    <script src="js/libs/adsum-client-api.es5.min.js"></script>
+    <script src="js/libs/adsum-web-map.es5.min.js"></script>
+    <script src="js/libs/dat.gui.min.js"></script>
+    <script>
+    // ======================INITIALIZATION======================
+    var adsumWebMap = null;
+    var entityManager = null;
+
+    // entry point
+    window.onload = function() {
+        initAdsumClientApi();
+        initAdsumWebMap();
+    };
+
+    var presentSortResults = function(results) {
+        return results.map(function(element) {
+            var transformedElement = {
+                "distance to start point": element.length,
+                "place id": element.place.id
+            }
+            return transformedElement;
+        });
+    }
+
+    // callback definitions 
+    var guiParam = {
+        'all places': function() {
+            window.alert("See the results in the console");
+            sortAllPlaces().then(function(results) {
+                console.table(presentSortResults(results))
+            });
+        },
+        'a poi places': function() {
+            window.alert("See the results in the console");
+            sortPoiPlaces().then(function(results) {
+                console.table(presentSortResults(results));
+            });
+        }
+    };
+
+    // initialize the adsum-client-api entity manager to get data
+    var initAdsumClientApi = function() {
+        var clientOptions = new ACA.Options();
+        clientOptions.endpoint = "https://api.adsum.io";
+        clientOptions.site = 322;
+        clientOptions.username = "323-device";
+        clientOptions.key = "343169bf805f8abd5fa71a4f529594a654de6afbac70a2d867a8b458c526fb7d";
+
+        entityManager = new ACA.EntityManager(clientOptions);
+    };
+
+    // initialize the adsum-web-map => give it the entity manager and customize it
+    var initAdsumWebMap = function() {
+        var adsumWebMapOptions = {
+            container: "adsum-web-map-container",
+            deviceId: 323,
+            entityManager: entityManager,
+            floorsOptions: {
+                showFloorsUnder: true,
+                useFloorAnimations: true
+            },
+            pathsOptions: {
+                scaleRatio: 2,
+                patternSpace: 10,
+                speedRatio: 1.5
+            },
+            positionIndicatorOptions: {
+                scaleRatio: 1
+            },
+        };
+
+        adsumWebMap = new AWM.AdsumWebMap(adsumWebMapOptions);
+
+        adsumWebMap.init().then(function() {
+            initGui();
+            initModels();
+        });
+    };
+
+    // initialize the graphic user interface
+    var initGui = function() {
+        var gui = new dat.GUI();
+        var f1 = gui.addFolder('Sort');
+        f1.add(guiParam, 'all places');
+        f1.add(guiParam, 'a poi places');
+
+        var info = document.createElement('div');
+        info.style.position = 'absolute';
+        info.style.top = '10px';
+        info.style.width = '100%';
+        info.style.textAlign = 'center';
+        info.innerHTML = 'AdsumWebMap example : how to sort paths. See the console in dev-tools for results.';
+        document.getElementById("adsum-web-map-container").appendChild(info);
+    };
+
+    // initialize the models used for path patterns and for the start point 
+    var initModels = function() {
+        adsumWebMap.pathManager.setPathPatternObject('./models/path_arrow.json');
+        adsumWebMap.pathManager.setStartPointObject('./models/youarehere.json');
+    };
+
+    // ======================PATH SORTING FUNCTIONS======================
+
+    // sort all the places on the map ordered by their distance to the start point
+    var sortAllPlaces = function() {
+        var places = entityManager.getRepository("Place").getAll();
+        return sortPlaces(places);
+    };
+
+    // sort all the places linked to a poi ordered by their distance to the start point
+    var sortPoiPlaces = function() {
+        var poiId = 115309; // The cash dispenser poi 
+        var poi = entityManager.getRepository("Poi").get(poiId)
+        var poiPlaces = entityManager.getRepository("Place").getList(poi.places);
+
+        return sortPlaces(poiPlaces);
+    };
+
+    var sortPlaces = function(places) {
+        // array to store all the promises and wait for their completion
+        const promises = [];
+
+        // compute the path to each place and return the place associated to the path length
+        places.forEach(function(place) {
+            var path = new AWM.Path();
+            path.end = place;
+            var promise = adsumWebMap.pathManager.computePath(path).then(function() {
+                return {
+                    place,
+                    length: path.length
+                };
+            }).catch(function(error) {
+                // failed to compute the path to the end place => this place cannot be reached so length = Infinity.
+                return {
+                    place,
+                    length: Infinity
+                };
+            });
+            promises.push(promise);
+        });
+
+        return Promise.all(promises).then(function(result) {
+            // sort the result by the path length 
+            return result.sort((a, b) => {
+                if (a.length < b.length) {
+                    return -1;
+                } else if (a.length > b.length) {
+                    return 1;
+                } else {
+                    return a.place.id - b.place.id;
+                }
+            });
+        });
+    }
+    </script>
+</body>
+
+</html>
