@@ -1,27 +1,30 @@
 {
-  "name": "adsum-web-map-examples",
-  "version": "1.0.0",
-  "description": "Examples of how to use the adsum-web-map",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://sylvain-abadie@github.com/AdactiveSAS/adsum-web-map-examples.git"
-  },
-  "keywords": [
-    "adsum-web-map",
-    "adsum",
-    "map"
-  ],
-  "author": "Sylvain Abadie",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/AdactiveSAS/adsum-web-map-examples/issues"
-  },
-  "homepage": "https://github.com/AdactiveSAS/adsum-web-map-examples#readme",
-  "devDependencies": {
-    "eslint": "^3.1.1"
-  }
+    "name": "adsum-web-map-examples",
+    "version": "1.0.0",
+    "description": "Examples of how to use the adsum-web-map",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "cd src; http-server -o"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://sylvain-abadie@github.com/AdactiveSAS/adsum-web-map-examples.git"
+    },
+    "keywords": [
+        "adsum-web-map",
+        "adsum",
+        "map",
+        "webgl"
+    ],
+    "author": "Sylvain Abadie",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/AdactiveSAS/adsum-web-map-examples/issues"
+    },
+    "homepage": "https://github.com/AdactiveSAS/adsum-web-map-examples#readme",
+    "devDependencies": {
+        "eslint": "^3.1.1",
+        "http-server": "^0.9.0"
+    }
 }
+
