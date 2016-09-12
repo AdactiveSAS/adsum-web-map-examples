@@ -129,7 +129,7 @@
             var shapeId = place.shape_id;
 
             if (place.pois.size > 0 && adsumWebMap.mapManager.isShapeOnCurrentFloor(shapeId)) {
-                adsumWebMap.mapManager.resetShapeColor(shapeId).then((complete) => {
+                adsumWebMap.mapManager.resetShapeColor(shapeId).then(function(complete) {
                     if (complete) adsumWebMap.mapManager.setShapeBounceDown(shapeId);
                 });
             }

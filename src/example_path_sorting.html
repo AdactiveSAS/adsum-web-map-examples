@@ -166,7 +166,7 @@
 
         return Promise.all(promises).then(function(result) {
             // sort the result by the path length 
-            return result.sort((a, b) => {
+            return result.sort(function(a, b) {
                 if (a.length < b.length) {
                     return -1;
                 } else if (a.length > b.length) {
