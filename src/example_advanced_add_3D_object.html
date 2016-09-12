@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>AdsumWebMap : advanced : Click on the floor or site to add boxes on it</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+    html,
+    body {
+        font-family: Monospace;
+        background-color: #f0f0f0;
+        height: 100%;
+        width: 100%;
+    }
+    
+    #adsum-web-map-container {
+        height: 100%;
+        width: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="adsum-web-map-container"></div>
+    <script src="js/libs/adsum-client-api.es5.min.js"></script>
+    <script src="js/libs/adsum-web-map.es5.min.js"></script>
+    <script src="js/libs/dat.gui.min.js"></script>
+    <script>
+    // ======================INITIALIZATION======================
+    var adsumWebMap = null;
+    var entityManager = null;
+
+    // entry point
+    window.onload = function() {
+        initAdsumClientApi();
+        initAdsumWebMap();
+    };
+
+    // initialize the adsum-client-api entity manager to get data
+    var initAdsumClientApi = function() {
+        var clientOptions = new ACA.Options();
+        clientOptions.endpoint = "https://api.adsum.io";
+        clientOptions.site = 322;
+        clientOptions.username = "323-device";
+        clientOptions.key = "343169bf805f8abd5fa71a4f529594a654de6afbac70a2d867a8b458c526fb7d";
+
+        entityManager = new ACA.EntityManager(clientOptions);
+    };
+
+    // initialize the adsum-web-map => give it the entity manager and customize it
+    var initAdsumWebMap = function() {
+        var adsumWebMapOptions = {
+            container: "adsum-web-map-container",
+            deviceId: 323,
+            entityManager: entityManager,
+            floorsOptions: {
+                showFloorsUnder: true,
+                useFloorAnimations: true
+            },
+            pathsOptions: {
+                scaleRatio: 2,
+                patternSpace: 10,
+                speedRatio: 1.5
+            },
+            positionIndicatorOptions: {
+                scaleRatio: 1
+            },
+        };
+
+        adsumWebMap = new AWM.AdsumWebMap(adsumWebMapOptions);
+
+        adsumWebMap.init().then(function() {
+            initGui();
+            initModels();
+            bindMouseClickOnFloor();
+        });
+    };
+
+    // initialize the graphic user interface
+    var initGui = function() {
+        var info = document.createElement('div');
+        info.style.position = 'absolute';
+        info.style.top = '10px';
+        info.style.width = '100%';
+        info.style.textAlign = 'center';
+        info.innerHTML = "AdsumWebMap example : Click on the floors or site to add boxes where you click";
+        document.getElementById("adsum-web-map-container").appendChild(info);
+    };
+
+    // initialize the models used for path patterns and for the start point 
+    var initModels = function() {
+        adsumWebMap.pathManager.setPathPatternObject('./models/path_arrow.json');
+        adsumWebMap.pathManager.setStartPointObject('./models/youarehere.json');
+    };
+
+    // ======================CUSTOM OBJECTS EDITING======================
+
+    // Generate random hex color 
+    var getRandomHexColor = function() {
+        return parseInt(Math.floor(Math.random() * 16777215).toString(16), 16);
+    }
+
+    /**
+     * Create a THREE.js Box
+     * @param  {number} size  The size of the box
+     * @param  {number} color The color of the box
+     * @return {THREE.Mesh} The box mesh
+     */
+    var createBox = function(size, color) {
+        var geometry = new AWM.THREE.BoxGeometry(size, size, size);
+        var material = new AWM.THREE.MeshPhongMaterial({
+            color: color
+        });
+        return new AWM.THREE.Mesh(geometry, material);
+    };
+
+    var add3DObjectOnFloor = function(floorId, clickPosition) {
+        var boxSize = 10;
+
+        var floor = null;
+        if (floorId === -1) {
+            // Warning : accessing variables beginning _ means they are private and is not recommended  
+            // Retrieve the site THREE.Mesh
+            floor = adsumWebMap.mapManager._siteController.getSite();
+        } else {
+            // Warning : accessing variables beginning _ means they are private and is not recommended  
+            // Retrieve the floor THREE.Mesh
+            floor = adsumWebMap.mapManager._floorController.getById(floorId);
+        }
+
+        // Create the box mesh with a random color
+        var box = createBox(boxSize, getRandomHexColor());
+
+        // Get the click position in the floor coordinate system 
+        clickPosition = floor.worldToLocal(clickPosition.clone());
+
+        // Set to box position where the user clicked
+        box.position.copy(clickPosition);
+        // Move the box up so that it lies properly on the floor
+        box.position.z += boxSize / 2;
+        // Add the box to the floor mesh
+        floor.add(box);
+
+    };
+
+    // Bind a click on a floor to the function add3DObjectOnFloor
+    var bindMouseClickOnFloor = function() {
+        adsumWebMap.mapManager.events.floor.mouseClick.add(add3DObjectOnFloor);
+    };
+    </script>
+</body>
+
+</html>

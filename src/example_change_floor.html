@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>AdsumWebMap : Change floor</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+    html,
+    body {
+        font-family: Monospace;
+        background-color: #f0f0f0;
+        height: 100%;
+        width: 100%;
+    }
+    
+    #adsum-web-map-container {
+        height: 100%;
+        width: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="adsum-web-map-container"></div>
+    <script src="js/libs/adsum-client-api.es5.min.js"></script>
+    <script src="js/libs/adsum-web-map.es5.min.js"></script>
+    <script src="js/libs/dat.gui.min.js"></script>
+    <script>
+    // ======================INITIALIZATION======================
+    var SHAPE_MOUSE_OVER_COLOR = 0xEEEEEE;
+    var SHAPE_SELECTED_COLOR = 0xFFEE00;
+
+    var ZOOM_ON_PLACE = true;
+
+    var adsumWebMap = null;
+    var entityManager = null;
+    var selectedPlace = null;
+
+    // entry point
+    window.onload = function() {
+        initAdsumClientApi();
+        initAdsumWebMap();
+    };
+
+    // callback definitions 
+    var guiParam = {
+        'floor': []
+    };
+
+    // initialize the adsum-client-api entity manager to get data
+    var initAdsumClientApi = function() {
+        var clientOptions = new ACA.Options();
+        clientOptions.endpoint = "https://api.adsum.io";
+        clientOptions.site = 322;
+        clientOptions.username = "323-device";
+        clientOptions.key = "343169bf805f8abd5fa71a4f529594a654de6afbac70a2d867a8b458c526fb7d";
+
+        entityManager = new ACA.EntityManager(clientOptions);
+    };
+
+    // initialize the adsum-web-map => give it the entity manager and customize it
+    var initAdsumWebMap = function() {
+        var adsumWebMapOptions = {
+            container: "adsum-web-map-container",
+            deviceId: 323,
+            entityManager: entityManager,
+            floorsOptions: {
+                showFloorsUnder: true,
+                useFloorAnimations: true
+            },
+            pathsOptions: {
+                scaleRatio: 2,
+                patternSpace: 10,
+                speedRatio: 1.5
+            },
+            positionIndicatorOptions: {
+                scaleRatio: 1
+            },
+        };
+
+        adsumWebMap = new AWM.AdsumWebMap(adsumWebMapOptions);
+
+        adsumWebMap.init().then(function() {
+            initGui();
+            initModels();
+            bindEvents();
+        });
+    };
+
+    // Initialize the models used for path patterns and for the start point 
+    var initModels = function() {
+        adsumWebMap.pathManager.setPathPatternObject('./models/path_arrow.json');
+        adsumWebMap.pathManager.setStartPointObject('./models/youarehere.json');
+    };
+
+    var changeFloor = function(floorId) {
+        // You have to call those two methods to properly change a floor 
+        adsumWebMap.cameraManager.centerOnFloor(floorId);
+        adsumWebMap.mapManager.setCurrentFloor(floorId);
+        // You can also chain animations : 
+        // adsumWebMap.mapManager.setCurrentFloor(floorId).then(function() { 
+        //     adsumWebMap.cameraManager.centerOnFloor(floorId);
+        // });
+    };
+
+    // initialize the graphic user interface
+    var initGui = function() {
+        var info = document.createElement('div');
+        info.style.position = 'absolute';
+        info.style.top = '50px';
+        info.style.width = '100%';
+        info.style.textAlign = 'center';
+        info.innerHTML = 'AdsumWebMap example : Select a floor in the control box to change the current floor';
+
+        document.getElementById("adsum-web-map-container").appendChild(info);
+
+        initFloorGui();
+    };
+
+    var initFloorGui = function() {
+        // Get a list of all the floors 
+        var floors = adsumWebMap.mapManager.getAllFloors();
+        // Add the id -1 for the site (outside view)
+        floors.unshift(-1);
+
+        var gui = new dat.GUI();
+        var controller = gui.add(guiParam, "floor", floors);
+        // Init the drop-down at the current floor value
+        controller.setValue(adsumWebMap.mapManager.getCurrentFloor());
+
+        // When the user changes the selected floor in the drop-down, update the map
+        controller.onChange(function(floorId) {
+            changeFloor(parseInt(floorId));
+        });
+    };
+
+    var bindEvents = function() {
+        adsumWebMap.mapManager.events.floor.willChange.add(function(floorId) {
+            console.log("The floor " + floorId + " will be the currentFloor");
+        });
+
+        adsumWebMap.mapManager.events.floor.didChange.add(function(floorId) {
+            console.log("The floor " + floorId + " is now the current floor");
+        });
+    };
+    </script>
+</body>
+
+</html>
