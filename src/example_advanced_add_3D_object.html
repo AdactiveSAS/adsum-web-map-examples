@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>AdsumWebMap : create and edit custom objects</title>
+    <title>AdsumWebMap : advanced : Click on the floor or site to add boxes on it</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
@@ -25,6 +25,7 @@
     <div id="adsum-web-map-container"></div>
     <script src="js/libs/adsum-client-api.es5.min.js"></script>
     <script src="js/libs/adsum-web-map.es5.min.js"></script>
+    <script src="js/libs/dat.gui.min.js"></script>
     <script>
     // ======================INITIALIZATION======================
     var adsumWebMap = null;
@@ -72,7 +73,6 @@
         adsumWebMap.init().then(function() {
             initGui();
             initModels();
-            bindMouseClickOnLabel();
             bindMouseClickOnFloor();
         });
     };
@@ -96,69 +96,57 @@
 
     // ======================CUSTOM OBJECTS EDITING======================
 
-    var changeLabelText = function(labelPlace) {
-        var customObjectRepository = entityManager.getRepository("CustomObject");
-        // Create a writable copy of the label that was clicked
-        var label = customObjectRepository.getList(labelPlace.custom_objects)[0].clone();
-        var text = prompt("Please enter some text", "");
-        if (text != null) {
-            // Set the label text
-            label.label = text;
-            // Add a background color 
-            label.background_color = "#0000FF";
-            // Persist the modified object. The AdsumWebMap will automatically detect the change and update the label
-            customObjectRepository.persist(label);
+    // Generate random hex color 
+    var getRandomHexColor = function() {
+        return parseInt(Math.floor(Math.random() * 16777215).toString(16), 16);
+    }
+
+    /**
+     * Create a THREE.js Box
+     * @param  {number} size  The size of the box
+     * @param  {number} color The color of the box
+     * @return {THREE.Mesh} The box mesh
+     */
+    var createBox = function(size, color) {
+        var geometry = new AWM.THREE.BoxGeometry(size, size, size);
+        var material = new AWM.THREE.MeshPhongMaterial({
+            color: color
+        });
+        return new AWM.THREE.Mesh(geometry, material);
+    };
+
+    var add3DObjectOnFloor = function(floorId, clickPosition) {
+        var boxSize = 10;
+
+        var floor = null;
+        if (floorId === -1) {
+            // Warning : accessing variables beginning _ means they are private and is not recommended  
+            // Retrieve the site THREE.Mesh
+            floor = adsumWebMap.mapManager._siteController.getSite();
+        } else {
+            // Warning : accessing variables beginning _ means they are private and is not recommended  
+            // Retrieve the floor THREE.Mesh
+            floor = adsumWebMap.mapManager._floorController.getById(floorId);
         }
+
+        // Create the box mesh with a random color
+        var box = createBox(boxSize, getRandomHexColor());
+
+        // Get the click position in the floor coordinate system 
+        clickPosition = floor.worldToLocal(clickPosition.clone());
+
+        // Set to box position where the user clicked
+        box.position.copy(clickPosition);
+        // Move the box up so that it lies properly on the floor
+        box.position.z += boxSize / 2;
+        // Add the box to the floor mesh
+        floor.add(box);
+
     };
 
-    var createPicto = function(floorId, position) {
-        // Create a ACA.File for the image you want to display  
-        var file = new ACA.File();
-        // You have to give a name to the file
-        file.name = "adsum";
-        // Set the url of the image you want to display
-        file.uri = "images/adsum.png";
-        // Persist the file entity
-        entityManager.getRepository("File").persist(file);
-
-
-        // Create a place that will be associated to the picto
-        var place = new ACA.Place();
-        // You have to give a name to the place
-        place.name = "adsum-place";
-        // Position the place where the user clicked  
-        place.position = {
-            x: position.x,
-            y: position.y,
-            z: 0 // A place always z = 0
-        };
-        // The place is on the clicked floor
-        place.floor_id = floorId;
-        // Persist the place entity
-        entityManager.getRepository("Place").persist(place);
-
-
-        // Create the picto
-        var picto = new ACA.Picto();
-        // Indicate which file the picto is displaying
-        picto.file = file;
-        // Indicate which place the picto is on
-        picto.place = place;
-        // You must specify the width and height of the picto
-        picto.width = 50;
-        picto.height = 50;
-        // Persist the picto. The AdsumWebMap will detect a picto has been created and will display it
-        entityManager.getRepository("CustomObject").persist(picto);
-    };
-
-    // Bind a click on a label to the function changeLabelText
-    var bindMouseClickOnLabel = function() {
-        adsumWebMap.mapManager.events.label.mouseClick.add(changeLabelText);
-    };
-
-    // Bind a click on a floor to the function createPicto
+    // Bind a click on a floor to the function add3DObjectOnFloor
     var bindMouseClickOnFloor = function() {
-        adsumWebMap.mapManager.events.floor.mouseClick.add(createPicto);
+        adsumWebMap.mapManager.events.floor.mouseClick.add(add3DObjectOnFloor);
     };
     </script>
 </body>
