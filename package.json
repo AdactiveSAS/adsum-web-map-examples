@@ -1,10 +1,10 @@
 {
     "name": "adsum-web-map-examples",
-    "version": "1.2.0",
+    "version": "1.2.2",
     "description": "Examples of how to use the adsum-web-map",
-    "main": "docs/index.js",
+    "main": "src/index.js",
     "scripts": {
-        "start": "http-server docs -o"
+        "start": "http-server src -o"
     },
     "repository": {
         "type": "git",
