@@ -1,6 +1,6 @@
 {
     "name": "adsum-web-map-examples",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "description": "Examples of how to use the adsum-web-map",
     "main": "src/index.js",
     "scripts": {
