@@ -23,9 +23,10 @@
 
 <body>
     <div id="adsum-web-map-container"></div>
-    <script src="js/libs/adsum-client-api.es5.min.js"></script>
-    <script src="js/libs/adsum-web-map.es5.min.js"></script>
-    <script src="js/libs/dat.gui.min.js"></script>
+    <script type="text/JavaScript" src="js/libs/polyfill.min.js"></script>
+    <script type="text/JavaScript" src="js/libs/adsum-client-api.ie9.min.js"></script>
+    <script type="text/JavaScript" src="js/libs/adsum-web-map.ie10.min.js"></script>
+    <script type="text/JavaScript" src="js/libs/dat.gui.min.js"></script>
     <script>
     // ======================INITIALIZATION======================
     var SHAPE_MOUSE_OVER_COLOR = 0xEEEEEE;
@@ -39,8 +40,11 @@
 
     // entry point
     window.onload = function() {
-        initAdsumClientApi();
-        initAdsumWebMap();
+        initAdsumClientApi().then(function(){
+            initAdsumWebMap();
+        }, function(e){
+            console.error("Error: Unable to initialize EntityManager: " + e.message);
+        });
     };
 
     // callback definitions 
@@ -55,8 +59,8 @@
         clientOptions.site = 322;
         clientOptions.username = "323-device";
         clientOptions.key = "343169bf805f8abd5fa71a4f529594a654de6afbac70a2d867a8b458c526fb7d";
-
         entityManager = new ACA.EntityManager(clientOptions);
+        return entityManager.load();
     };
 
     // initialize the adsum-web-map => give it the entity manager and customize it
