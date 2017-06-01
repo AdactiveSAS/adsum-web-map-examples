@@ -23,18 +23,56 @@
 
 <body>
     <div id="adsum-web-map-container"></div>
-    <script src="js/libs/adsum-client-api.es5.min.js"></script>
-    <script src="js/libs/adsum-web-map.es5.min.js"></script>
-    <script src="js/libs/dat.gui.min.js"></script>
+    <script type="text/JavaScript" src="js/libs/polyfill.min.js"></script>
+    <script type="text/JavaScript" src="js/libs/adsum-client-api.ie9.min.js"></script>
+    <script type="text/JavaScript" src="js/libs/adsum-web-map.ie10.min.js"></script>
+    <script type="text/JavaScript" src="js/libs/dat.gui.min.js"></script>
     <script>
     // ======================INITIALIZATION======================
     var adsumWebMap = null;
     var entityManager = null;
+    var sortResultTable = null;
 
     // entry point
     window.onload = function() {
-        initAdsumClientApi();
-        initAdsumWebMap();
+        sortResultTable = document.createElement("div");
+        sortResultTable.style.overflowX = "hidden";
+        sortResultTable.style.overflowY = "auto";
+        sortResultTable.style.msOverflowX = "hidden";
+        sortResultTable.style.msOverflowY = "auto";
+        sortResultTable.style.display = "block";
+        sortResultTable.style.position = "absolute";
+        sortResultTable.style.left = "2px";
+        sortResultTable.style.top = "2px";
+        sortResultTable.style.width = "20%";
+        sortResultTable.style.height = "33%";
+        sortResultTable.style.padding = "3%";
+        sortResultTable.style.border = "2px solid gray";
+        sortResultTable.style.background = "silver";
+        document.getElementsByTagName("body")[0].appendChild(sortResultTable);
+
+        initAdsumClientApi().then(function(){
+            initAdsumWebMap();
+        }, function(e){
+            console.error("Error: Unable to initialize EntityManager: " + e.message);
+        });
+    };
+
+    var clearTableData = function(){
+        sortResultTable.innerHTML = "";
+    };
+
+    var appendTableData = function(data){
+        var list = document.createElement("ul");
+        list.style.marginBottom = "2%";
+        for(var i = 0; i < data.length; ++i)
+        {
+            var li = document.createElement("li");
+            li.innerHTML = data[i];
+
+            list.appendChild(li);
+        }
+        sortResultTable.appendChild(list);
     };
 
     var presentSortResults = function(results) {
@@ -50,15 +88,21 @@
     // callback definitions 
     var guiParam = {
         'all places': function() {
-            window.alert("See the results in the console");
             sortAllPlaces().then(function(results) {
-                console.table(presentSortResults(results))
+                clearTableData();
+                for(var i = 0; i < results.length; ++i)
+                {
+                    appendTableData([ "Distance = " + results[i].length + "<br />Place = " + results[i].place.name ]);
+                }
             });
         },
         'a poi places': function() {
-            window.alert("See the results in the console");
             sortPoiPlaces().then(function(results) {
-                console.table(presentSortResults(results));
+                clearTableData();
+                for(var i = 0; i < results.length; ++i)
+                {
+                    appendTableData([ "Distance = " + results[i].length + "<br />Place = " + results[i].place.name] );
+                }
             });
         }
     };
@@ -70,8 +114,8 @@
         clientOptions.site = 322;
         clientOptions.username = "323-device";
         clientOptions.key = "343169bf805f8abd5fa71a4f529594a654de6afbac70a2d867a8b458c526fb7d";
-
         entityManager = new ACA.EntityManager(clientOptions);
+        return entityManager.load();
     };
 
     // initialize the adsum-web-map => give it the entity manager and customize it
@@ -143,7 +187,7 @@
 
     var sortPlaces = function(places) {
         // array to store all the promises and wait for their completion
-        const promises = [];
+        var promises = [];
 
         // compute the path to each place and return the place associated to the path length
         places.forEach(function(place) {
@@ -151,13 +195,13 @@
             path.end = place;
             var promise = adsumWebMap.pathManager.computePath(path).then(function() {
                 return {
-                    place,
+                    place: place,
                     length: path.length
                 };
             }).catch(function(error) {
                 // failed to compute the path to the end place => this place cannot be reached so length = Infinity.
                 return {
-                    place,
+                    place: place,
                     length: Infinity
                 };
             });
