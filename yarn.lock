@@ -10,9 +10,9 @@
   version "1.0.3-rc.10"
   resolved "https://registry.yarnpkg.com/@adactive/adactive-logger/-/adactive-logger-1.0.3-rc.10.tgz#77265b1d8bde1eae8687b4abe061a83fe3f16052"
 
-"@adactive/adsum-client-api@^2.0.1-rc.4":
-  version "2.0.1-rc.4"
-  resolved "https://registry.yarnpkg.com/@adactive/adsum-client-api/-/adsum-client-api-2.0.1-rc.4.tgz#46e97c55e575e94e29b1bd8dc0ef123e8a7d3a0b"
+"@adactive/adsum-client-api@^2.0.1-rc.6":
+  version "2.0.1-rc.6"
+  resolved "https://registry.yarnpkg.com/@adactive/adsum-client-api/-/adsum-client-api-2.0.1-rc.6.tgz#80fa06384e3b3fb74cf3a2e9a8d0eb61913aa820"
   dependencies:
     "@adactive/adactive-abstract-options" "^1.0.2-rc.2"
     "@adactive/adactive-logger" "^1.0.3-rc.10"
@@ -24,9 +24,9 @@
   version "1.0.1-rc.2"
   resolved "https://registry.yarnpkg.com/@adactive/adsum-space-transform/-/adsum-space-transform-1.0.1-rc.2.tgz#11ce594e749c2d2c618eecb5fb09216daec232b1"
 
-"@adactive/adsum-web-map@^5.0.1-rc.6":
-  version "5.0.1-rc.6"
-  resolved "https://registry.yarnpkg.com/@adactive/adsum-web-map/-/adsum-web-map-5.0.1-rc.6.tgz#399d3def1285437923568adb98bc2c1f3dd4edc7"
+"@adactive/adsum-web-map@^5.0.1-rc.7":
+  version "5.0.1-rc.7"
+  resolved "https://registry.yarnpkg.com/@adactive/adsum-web-map/-/adsum-web-map-5.0.1-rc.7.tgz#67a2ac12027279bc297e99b5dd15d70801c6fc30"
   dependencies:
     "@adactive/adactive-abstract-options" "^1.0.2-rc.2"
     "@adactive/adsum-space-transform" "^1.0.1-rc.2"

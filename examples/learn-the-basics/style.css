@@ -1,0 +1,30 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+}
+
+#wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#adsum-web-map-container {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+#loading, #error {
+  height: 60%;
+  padding-top: 10%;
+  display: block;
+  margin: auto;
+}
+
+.hidden {
+  display: none !important;
+}

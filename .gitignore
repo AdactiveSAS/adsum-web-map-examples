@@ -3,3 +3,5 @@
 
 .npmrc
 .idea
+
+yarn-error\.log

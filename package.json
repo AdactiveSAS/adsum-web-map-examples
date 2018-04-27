@@ -19,8 +19,8 @@
   },
   "homepage": "https://github.com/AdactiveSAS/adsum-web-map-examples#readme",
   "dependencies": {
-    "@adactive/adsum-client-api": "^2.0.1-rc.4",
-    "@adactive/adsum-web-map": "^5.0.1-rc.6"
+    "@adactive/adsum-client-api": "^2.0.1-rc.6",
+    "@adactive/adsum-web-map": "^5.0.1-rc.7"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
