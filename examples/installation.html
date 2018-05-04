@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      position: relative;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #adsum-web-map-container {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+<div id="adsum-web-map-container"></div>
+<!-- Assuming node_modules is located in parent directory -->
+<script src="../node_modules/@adactive/adsum-client-api/build/adsum-client-api.browser.js"></script>
+<script src="../node_modules/@adactive/adsum-web-map/build/adsum-web-map.js"></script>
+<script type="application/javascript">
+  // AdsumClientApi and AdsumWebMap namespaces are available globally
+
+  // Create an entityManager using the API credentials (see AdsumClientAPI documentation for more details)
+  const entityManager = new AdsumClientApi.EntityManager({
+    "endpoint": "https://api.adsum.io",
+    "site": 322,
+    "username": "323-device",
+    "key": "343169bf805f8abd5fa71a4f529594a654de6afbac70a2d867a8b458c526fb7d"
+  });
+
+  // Create the loader responsible for converting Adsum data into the 3D engine
+  const adsumLoader = new AdsumWebMap.AdsumLoader({
+    entityManager, // Give it in order to be used to consume REST API
+    deviceId: 323 // The device Id to use
+  });
+
+  // Create the Map instance
+  const adsumWebMap = new AdsumWebMap.AdsumWebMap({
+    loader: adsumLoader, // The loader to use
+    engine: {
+      container: document.getElementById('adsum-web-map-container'), // The div DOMElement to insert the canvas into
+    }
+  });
+
+  // Init the Map
+  adsumWebMap.init().then(() => {
+    console.log('AdsumWebMap is ready to start');
+
+    // Start the rendering
+    return adsumWebMap.start();
+  }).then(() => {
+    console.log('AdsumWebMap is running');
+  });
+</script>
+</body>
+</html>
