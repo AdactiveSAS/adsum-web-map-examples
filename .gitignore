@@ -1,17 +1,7 @@
-node_modules/
-
-.npmrc
-.idea
-
-yarn-error\.log
-
-/node_modules/*
-!/node_modules/@adactive
-
 .npmrc
 .idea
 
 yarn-error\.log
 node_modules/
-!node_modules/@adactive/*/build/*
+!node_modules/@adactive/*/build/*\.js
 !node_modules/@adactive/*/LICENSE.md
