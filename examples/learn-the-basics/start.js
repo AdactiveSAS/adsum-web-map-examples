@@ -39,12 +39,12 @@ const onStart = () => {
 
   // Get all the floors to aliment the floor select list
   adsumWebMap.objectManager.floors.forEach((floorObject) => {
-    floorControls.floorNameToId[String(floorObject.id)] = floorObject.id;
+    floorControls.floorNameToId[floorObject.name] = floorObject.id;
   });
 
   // Update the floor controls as depending of the device, the default floor is not always none.
   const currentFloorObject = adsumWebMap.sceneManager.currentFloor;
-  floorControls.currentFloor = currentFloorObject === null ? "none" : String(currentFloorObject.id);
+  floorControls.currentFloor = currentFloorObject === null ? "none" : currentFloorObject.name;
 
   gui.add(
     floorControls, // The object containing the data
