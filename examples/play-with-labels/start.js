@@ -12,7 +12,7 @@ function onError(e) {
   errorDiv.classList.remove('hidden');
 }
 
-const behaviorControls = {onClick: 'select'};
+const behaviorControls = {onClick: 'edit'};
 let gui = null;
 
 function onStart() {
@@ -60,10 +60,10 @@ function onStart() {
     .onChange(floorControls.changeFloor);
 
   // Add the onClick behavior selection
-  gui.add(behaviorControls, 'onClick', ['select', 'createText', 'createImage', 'delete'])
+  gui.add(behaviorControls, 'onClick', ['edit', 'createText', 'createImage', 'delete', 'levelOfDetails'])
     .onFinishChange(() => {
-      // Make sure to reset the selection
-      select(null);
+      // Make sure to reset the edition
+      edit(null);
     });
 
   // Let's add the event listener
@@ -71,8 +71,8 @@ function onStart() {
     AdsumWebMap.MOUSE_EVENTS.click,
     (event) => {
       switch (behaviorControls.onClick) {
-        case 'select':
-          select(getClickedLabel(event.intersects));
+        case 'edit':
+          edit(getClickedLabel(event.intersects));
           break;
         case 'createText':
           createLabelText(event);
@@ -91,7 +91,7 @@ function onStart() {
 let currentLabelObject = null;
 let propertiesUi = null;
 
-function select(labelObject) {
+function edit(labelObject) {
   if (currentLabelObject === labelObject) {
     return;
   }
@@ -119,6 +119,8 @@ function select(labelObject) {
   }
 
   currentLabelObject = labelObject;
+
+  updateLevelOfDetailsUi();
 }
 
 function getClickedLabel(intersects) {
@@ -347,6 +349,58 @@ function createLabelTextUi(ui, labelObject) {
 
   return ui;
 }
+
+function updateLevelOfDetailsUi() {
+  const lodUi = document.getElementById('lod-ui');
+  if (currentLabelObject === null) {
+    lodUi.classList.add('hidden');
+  } else {
+    lodUi.classList.remove('hidden');
+
+    const levelStates = currentLabelObject.levelOfDetails.getLevelStates();
+    const startDistances = Object.keys(levelStates).map(parseFloat);
+    startDistances.sort();
+
+    const levelsUi = document.getElementById('lod-list');
+    levelsUi.innerHTML = '';
+
+    startDistances.forEach((startAt) => {
+      const row = document.createElement('tr');
+
+      const key = document.createElement('td');
+      key.innerText = startAt;
+      row.appendChild(key);
+
+      const value = document.createElement('td');
+      value.innerText = levelStates[startAt].displayMode;
+      row.appendChild(value);
+
+      const removeCell = document.createElement('td');
+      const removeBtn = document.createElement('button');
+      removeBtn.innerText = "Remove";
+      removeBtn.onclick = () => {
+        currentLabelObject.levelOfDetails.removeLevelState(startAt);
+        updateLevelOfDetailsUi();
+      };
+      removeCell.appendChild(removeBtn);
+      row.appendChild(removeCell);
+
+      levelsUi.appendChild(row);
+    });
+  }
+}
+
+function addLevelState() {
+  if (currentLabelObject !== null) {
+    const startAt = parseFloat(document.getElementById('startAt').value);
+    const displayMode = document.getElementById('displayMode').value;
+
+    currentLabelObject.levelOfDetails.addLevelState(startAt, new AdsumWebMap.DisplayLevelState(displayMode));
+    updateLevelOfDetailsUi();
+  }
+}
+
+document.getElementById('lod-add-action').onclick = addLevelState;
 
 function createLabelText(mouseEvent) {
   if (mouseEvent.intersects.length === 0) {
