@@ -214,10 +214,10 @@ const pathControls = {
     // Compute the path to find the shortest path
     return adsumWebMap.wayfindingManager.computePath(pathControls.current)
       .then(() => {
-        // The path is computed, and we have now access to path.pathSections which represents all steps
+        // The path is computed, and we have now access to path.getPathSections() which represents all steps
         // We will chain our promises
         let promise = Promise.resolve();
-        for(const pathSection of pathControls.current.pathSections) {
+        for(const pathSection of pathControls.current.getPathSections()) {
 
           // Do the floor change
           const floor = pathSection.ground.isFloor ? pathSection.ground : null;
@@ -229,8 +229,8 @@ const pathControls = {
 
           // Find any attached labelObjects to the pathSection destination
           let labelObjects = [];
-          if (pathSection.to !== null && pathSection.to.adsumObject !== null) {
-            const { adsumObject } = pathSection.to;
+          let adsumObject = adsumWebMap.objectManager.getByAdsumLocation(pathSection.to);
+          if (adsumObject !== null) {
             if (adsumObject.isLabel) {
               labelObjects = [adsumObject];
             } else if (adsumObject.isBuilding || adsumObject.isSpace) {
