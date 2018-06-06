@@ -358,21 +358,19 @@ function updateLevelOfDetailsUi() {
     lodUi.classList.remove('hidden');
 
     const levelStates = currentLabelObject.levelOfDetails.getLevelStates();
-    const startDistances = Object.keys(levelStates).map(parseFloat);
-    startDistances.sort();
 
     const levelsUi = document.getElementById('lod-list');
     levelsUi.innerHTML = '';
 
-    startDistances.forEach((startAt) => {
+    levelStates.forEach(({ startAt, levelState }) => {
       const row = document.createElement('tr');
 
       const key = document.createElement('td');
-      key.innerText = startAt;
+      key.innerText = String(startAt);
       row.appendChild(key);
 
       const value = document.createElement('td');
-      value.innerText = levelStates[startAt].displayMode;
+      value.innerText = levelState.displayMode;
       row.appendChild(value);
 
       const removeCell = document.createElement('td');

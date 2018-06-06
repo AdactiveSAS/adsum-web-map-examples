@@ -29,8 +29,8 @@
   resolved "https://registry.yarnpkg.com/@adactive/adsum-space-transform/-/adsum-space-transform-1.0.1.tgz#cc99cd611214bcbe1bbd8274d298cd163f53e712"
 
 "@adactive/adsum-web-map@^5.2.0-rc.4":
-  version "5.2.0-rc.7"
-  resolved "https://registry.yarnpkg.com/@adactive/adsum-web-map/-/adsum-web-map-5.2.0-rc.7.tgz#5a6ba40c31bbeec1503303c48034e568db510842"
+  version "5.2.0-rc.10"
+  resolved "https://registry.yarnpkg.com/@adactive/adsum-web-map/-/adsum-web-map-5.2.0-rc.10.tgz#a6892fbfeeb10298f920fac14309b9dd5bf24c31"
   dependencies:
     "@adactive/adactive-abstract-options" "1.1.0-rc.1"
     "@adactive/adsum-space-transform" "^1.0.1"
