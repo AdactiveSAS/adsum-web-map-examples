@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="style.css" rel="stylesheet" />
+</head>
+<body>
+<div id="wrapper">
+  <img id="loading" src="../../files/loading.gif"/>
+  <img id="error" class="hidden" src="../../files/error.png"/>
+  <div id="adsum-web-map-container"></div>
+  <div id="lod-ui" class="hidden">
+    <table class="table-fill">
+      <thead>
+        <tr>
+          <th>Distance</th>
+          <th>Display Mode</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody class="table-hover" id="lod-list">
+        <tr>
+          <td>0</td>
+          <td>NONE</td>
+          <td><button>REMOVE</button></td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>NONE</td>
+          <td><button>REMOVE</button></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td><input id="startAt" type="number" min="0" /></td>
+          <td>
+            <select id="displayMode">
+              <option value="none" selected>None</option>
+              <option value="visible">Visible</option>
+            </select>
+          </td>
+          <td><button id="lod-add-action">ADD</button></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<!-- Require the dependencies -->
+<script src="../../node_modules/@adactive/adsum-client-api/build/adsum-client-api.browser.js"></script>
+<script src="../../node_modules/@adactive/adsum-web-map/build/adsum-web-map.js"></script>
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.0/dat.gui.js"></script>
+
+<!-- Let's add the script -->
+<script src="start.js"></script>
+</body>
+</html>

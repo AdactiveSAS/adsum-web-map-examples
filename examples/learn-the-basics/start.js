@@ -39,12 +39,12 @@ const onStart = () => {
 
   // Get all the floors to aliment the floor select list
   adsumWebMap.objectManager.floors.forEach((floorObject) => {
-    floorControls.floorNameToId[String(floorObject.id)] = floorObject.id;
+    floorControls.floorNameToId[floorObject.name] = floorObject.id;
   });
 
   // Update the floor controls as depending of the device, the default floor is not always none.
   const currentFloorObject = adsumWebMap.sceneManager.currentFloor;
-  floorControls.currentFloor = currentFloorObject === null ? "none" : String(currentFloorObject.id);
+  floorControls.currentFloor = currentFloorObject === null ? "none" : currentFloorObject.name;
 
   gui.add(
     floorControls, // The object containing the data
@@ -71,6 +71,8 @@ const onStart = () => {
         selectionControls.resetBuilding(selectionControls.current);
       } else if (selectionControls.current !== null && selectionControls.current.isSpace) {
         selectionControls.resetSpace(selectionControls.current);
+      } else if (selectionControls.current !== null && selectionControls.current.isLabel) {
+        selectionControls.resetLabel(selectionControls.current);
       }
 
       selectionControls.current = object;
@@ -101,24 +103,43 @@ const onStart = () => {
       return adsumWebMap.cameraManager.centerOn(building)
         .then(() => {
           building.setColor(0x78e08f);
+          building.labels.forEach((labelObject) => {
+            labelObject.select();
+          })
         });
     },
     resetBuilding: (building) => {
       building.resetColor();
+      building.labels.forEach((labelObject) => {
+        labelObject.unselect();
+      })
     },
     highlightSpace: (space) => {
       return adsumWebMap.cameraManager.centerOn(space)
         .then(() => {
           space.setColor(0x78e08f);
           space.bounceUp(3);
+          space.labels.forEach((labelObject) => {
+            labelObject.select();
+          })
         });
     },
     highlightLabel: (label) => {
-      return adsumWebMap.cameraManager.centerOn(label);
+      return adsumWebMap.cameraManager.centerOn(label)
+        .then(() => {
+          label.select();
+        });
     },
     resetSpace: (space) => {
       space.resetColor();
       space.bounceDown();
+
+      space.labels.forEach((labelObject) => {
+        labelObject.unselect();
+      })
+    },
+    resetLabel: (label) => {
+      label.unselect();
     },
     // The click event handler
     onClick: ({intersects}) => {
@@ -193,10 +214,10 @@ const pathControls = {
     // Compute the path to find the shortest path
     return adsumWebMap.wayfindingManager.computePath(pathControls.current)
       .then(() => {
-        // The path is computed, and we have now access to path.pathSections which represents all steps
+        // The path is computed, and we have now access to path.getPathSections() which represents all steps
         // We will chain our promises
         let promise = Promise.resolve();
-        for(const pathSection of pathControls.current.pathSections) {
+        for(const pathSection of pathControls.current.getPathSections()) {
 
           // Do the floor change
           const floor = pathSection.ground.isFloor ? pathSection.ground : null;
@@ -206,10 +227,27 @@ const pathControls = {
           // Draw the step
           promise = promise.then(() => adsumWebMap.wayfindingManager.drawPathSection(pathSection));
 
+          // Find any attached labelObjects to the pathSection destination
+          let labelObjects = [];
+          let adsumObject = adsumWebMap.objectManager.getByAdsumLocation(pathSection.to);
+          if (adsumObject !== null) {
+            if (adsumObject.isLabel) {
+              labelObjects = [adsumObject];
+            } else if (adsumObject.isBuilding || adsumObject.isSpace) {
+              labelObjects = adsumObject.labels;
+            }
+          }
+
+          // Select label objects
+          promise = promise.then(() => labelObjects.forEach(labelObject => labelObject.select()));
+
           // Add a delay of 1.5 seconds
           promise = promise.then(() => new Promise((resolve) => {
             setTimeout(resolve, 1500);
           }));
+
+          // Unselect the label objects
+          promise = promise.then(() => labelObjects.forEach(labelObject => labelObject.unselect()));
         }
 
         return promise;
