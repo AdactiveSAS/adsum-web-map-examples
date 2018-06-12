@@ -2,21 +2,21 @@
 # yarn lockfile v1
 
 
-"@adactive/adactive-abstract-options@1.1.0-rc.1":
-  version "1.1.0-rc.1"
-  resolved "https://registry.yarnpkg.com/@adactive/adactive-abstract-options/-/adactive-abstract-options-1.1.0-rc.1.tgz#ba89d5c7e8a680f156c37801b28b3776e4aba5c3"
-
 "@adactive/adactive-abstract-options@^1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@adactive/adactive-abstract-options/-/adactive-abstract-options-1.0.2.tgz#b48175bb38ae909e3325acffefd8d29110cb56b2"
+
+"@adactive/adactive-abstract-options@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@adactive/adactive-abstract-options/-/adactive-abstract-options-1.1.0.tgz#f2550134d5f015076c0c1e5fe2fa5eb704d0a875"
 
 "@adactive/adactive-logger@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@adactive/adactive-logger/-/adactive-logger-1.0.3.tgz#2410f21234d89bc7d1ac185cfe79260e4a87bf42"
 
-"@adactive/adsum-client-api@^2.2.0-rc.1":
-  version "2.2.0-rc.1"
-  resolved "https://registry.yarnpkg.com/@adactive/adsum-client-api/-/adsum-client-api-2.2.0-rc.1.tgz#4a31bbbb991c40bd809c797301a31beb7d5dd9db"
+"@adactive/adsum-client-api@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@adactive/adsum-client-api/-/adsum-client-api-2.2.0.tgz#e28646f177f36272f176c9022192ffd9039e4821"
   dependencies:
     "@adactive/adactive-abstract-options" "^1.0.2"
     "@adactive/adactive-logger" "^1.0.3"
@@ -28,11 +28,11 @@
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@adactive/adsum-space-transform/-/adsum-space-transform-1.0.1.tgz#cc99cd611214bcbe1bbd8274d298cd163f53e712"
 
-"@adactive/adsum-web-map@^5.2.0-rc.11":
-  version "5.2.0-rc.11"
-  resolved "https://registry.yarnpkg.com/@adactive/adsum-web-map/-/adsum-web-map-5.2.0-rc.11.tgz#59efdfa41183568a06449d70210168f108f2ddb3"
+"@adactive/adsum-web-map@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@adactive/adsum-web-map/-/adsum-web-map-5.2.0.tgz#61875efcb4fbbf3351aeb6b6777ab39f548a7b77"
   dependencies:
-    "@adactive/adactive-abstract-options" "1.1.0-rc.1"
+    "@adactive/adactive-abstract-options" "^1.1.0"
     "@adactive/adsum-space-transform" "^1.0.1"
     es6-tween "^5.2.2"
     hammerjs "^2.0.6"
