@@ -1,6 +1,6 @@
 {
   "name": "adsum-web-map-examples",
-  "version": "5.2.0",
+  "version": "5.4.0",
   "description": "Examples of how to use the adsum-web-map version 5",
   "main": "src/index.js",
   "repository": "github:AdactiveSAS/adsum-web-map-examples",
@@ -20,7 +20,7 @@
   "homepage": "https://github.com/AdactiveSAS/adsum-web-map-examples#readme",
   "dependencies": {
     "@adactive/adsum-client-api": "^2.2.0",
-    "@adactive/adsum-web-map": "^5.2.0"
+    "@adactive/adsum-web-map": "^5.4.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -36,7 +36,7 @@
     "eslint-plugin-import": "^2.9.0"
   },
   "scripts": {
-    "start": "http-server src -o"
+    "start": "http-server . -o"
   },
   "license": "MIT"
 }

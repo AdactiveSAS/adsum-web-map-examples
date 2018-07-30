@@ -43,7 +43,7 @@ const onStart = () => {
   });
 
   // Update the floor controls as depending of the device, the default floor is not always none.
-  const currentFloorObject = adsumWebMap.sceneManager.currentFloor;
+  const currentFloorObject = adsumWebMap.sceneManager.getCurrentFloor();
   floorControls.currentFloor = currentFloorObject === null ? "none" : currentFloorObject.name;
 
   gui.add(
