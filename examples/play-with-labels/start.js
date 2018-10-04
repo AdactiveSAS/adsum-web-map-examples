@@ -4,7 +4,8 @@ const errorDiv = document.getElementById('error');
 const loadingDiv = document.getElementById('loading');
 
 // Put in upper scope to be able to access them on onStart later on
-let entityManager, adsumWebMap;
+let entityManager,
+  adsumWebMap;
 
 function onError(e) {
   console.error(e);
@@ -12,7 +13,7 @@ function onError(e) {
   errorDiv.classList.remove('hidden');
 }
 
-const behaviorControls = {onClick: 'edit'};
+const behaviorControls = { onClick: 'edit' };
 let gui = null;
 
 function onStart() {
@@ -22,10 +23,10 @@ function onStart() {
 
   const floorControls = {
     // The current floor label
-    currentFloor: "none",
+    currentFloor: 'none',
     // A map containing the display name to floor id
     floorNameToId: {
-      "none": null,
+      none: null,
     },
     // Handle User floor change
     changeFloor: (floorName) => {
@@ -35,11 +36,10 @@ function onStart() {
 
       // First change the floor
       return adsumWebMap.sceneManager.setCurrentFloor(floorObject)
-        .then(() => {
+        .then(() =>
           // Don't forget to center the camera on floor !
-          return adsumWebMap.cameraManager.centerOnFloor(floorObject);
-        });
-    }
+          adsumWebMap.cameraManager.centerOnFloor(floorObject));
+    },
   };
 
   // Get all the floors to aliment the floor select list
@@ -49,7 +49,7 @@ function onStart() {
 
   // Update the floor controls as depending of the device, the default floor is not always none.
   const currentFloorObject = adsumWebMap.sceneManager.getCurrentFloor();
-  floorControls.currentFloor = currentFloorObject === null ? "none" : currentFloorObject.name;
+  floorControls.currentFloor = currentFloorObject === null ? 'none' : currentFloorObject.name;
 
   gui.add(
     floorControls, // The object containing the data
@@ -60,7 +60,7 @@ function onStart() {
     .onChange(floorControls.changeFloor);
 
   // Add the onClick behavior selection
-  gui.add(behaviorControls, 'onClick', ['edit', 'createText', 'createImage', 'delete', 'levelOfDetails'])
+  gui.add(behaviorControls, 'onClick', ['edit', 'createText', 'createImage', 'delete', 'levelOfDetails', 'goTo'])
     .onFinishChange(() => {
       // Make sure to reset the edition
       edit(null);
@@ -83,8 +83,11 @@ function onStart() {
         case 'delete':
           deleteLabel(event);
           break;
+        case 'goTo':
+          goToLabel(event);
+          break;
       }
-    }
+    },
   );
 }
 
@@ -129,7 +132,7 @@ function getClickedLabel(intersects) {
   }
 
   // Let's grab the first intersect
-  let {object} = intersects[0];
+  const { object } = intersects[0];
 
   if (object.isLabel) {
     return object;
@@ -148,20 +151,20 @@ function getClickedLabel(intersects) {
 
 function createLabelObjectBaseUi(ui, labelObject) {
   ui
-    .add({autoScale: labelObject.autoScale}, 'autoScale')
+    .add({ autoScale: labelObject.autoScale }, 'autoScale')
     .onChange((autoScale) => {
       labelObject.setAutoScale(autoScale);
     });
 
   ui
-    .add({isPermanentDisplay: labelObject.isPermanentDisplay}, 'isPermanentDisplay')
+    .add({ isPermanentDisplay: labelObject.isPermanentDisplay }, 'isPermanentDisplay')
     .onChange((isPermanentDisplay) => {
       labelObject.setPermanentDisplay(isPermanentDisplay);
     });
 
   ui
     .add(
-      {orientationMode: labelObject.orientationMode},
+      { orientationMode: labelObject.orientationMode },
       'orientationMode',
       [
         AdsumWebMap.LABEL_ORIENTATION_MODES.BILLBOARD,
@@ -173,7 +176,7 @@ function createLabelObjectBaseUi(ui, labelObject) {
     });
 
   ui
-    .add({offsetX: labelObject.offset.x}, 'offsetX')
+    .add({ offsetX: labelObject.offset.x }, 'offsetX')
     .onChange((offsetX) => {
       labelObject.moveTo(
         offsetX,
@@ -183,7 +186,7 @@ function createLabelObjectBaseUi(ui, labelObject) {
     });
 
   ui
-    .add({offsetY: labelObject.offset.y}, 'offsetY')
+    .add({ offsetY: labelObject.offset.y }, 'offsetY')
     .onChange((offsetY) => {
       labelObject.moveTo(
         labelObject.offset.x,
@@ -193,7 +196,7 @@ function createLabelObjectBaseUi(ui, labelObject) {
     });
 
   ui
-    .add({offsetZ: labelObject.offset.z}, 'offsetZ')
+    .add({ offsetZ: labelObject.offset.z }, 'offsetZ')
     .onChange((offsetZ) => {
       labelObject.moveTo(
         labelObject.offset.x,
@@ -204,7 +207,7 @@ function createLabelObjectBaseUi(ui, labelObject) {
 
   ui
     .add(
-      {opacity: labelObject.opacity},
+      { opacity: labelObject.opacity },
       'opacity',
       0,
       1,
@@ -216,7 +219,7 @@ function createLabelObjectBaseUi(ui, labelObject) {
 
   ui
     .add(
-      {rotation: labelObject.rotation},
+      { rotation: labelObject.rotation },
       'rotation',
       0,
       360,
@@ -227,7 +230,7 @@ function createLabelObjectBaseUi(ui, labelObject) {
     });
 
   ui
-    .add({scaleX: labelObject.scale.x}, 'scaleX')
+    .add({ scaleX: labelObject.scale.x }, 'scaleX')
     .onChange((scaleX) => {
       labelObject.setScale(
         scaleX,
@@ -237,7 +240,7 @@ function createLabelObjectBaseUi(ui, labelObject) {
     });
 
   ui
-    .add({scaleY: labelObject.scale.y}, 'scaleY')
+    .add({ scaleY: labelObject.scale.y }, 'scaleY')
     .onChange((scaleY) => {
       labelObject.setScale(
         labelObject.scale.x,
@@ -247,7 +250,7 @@ function createLabelObjectBaseUi(ui, labelObject) {
     });
 
   ui
-    .add({scaleZ: labelObject.scale.z}, 'scaleZ')
+    .add({ scaleZ: labelObject.scale.z }, 'scaleZ')
     .onChange((scaleZ) => {
       labelObject.setScale(
         labelObject.scale.x,
@@ -261,19 +264,19 @@ function createLabelImageUi(ui, labelObject) {
   createLabelObjectBaseUi(ui, labelObject);
 
   ui
-    .add({image: labelObject.image}, 'image')
+    .add({ image: labelObject.image }, 'image')
     .onChange((image) => {
       labelObject.setImage(image);
     });
 
   ui
-    .add({height: labelObject.height}, 'height')
+    .add({ height: labelObject.height }, 'height')
     .onChange((height) => {
       labelObject.setHeight(height);
     });
 
   ui
-    .add({width: labelObject.width}, 'width')
+    .add({ width: labelObject.width }, 'width')
     .onChange((width) => {
       labelObject.setWidth(width);
     });
@@ -283,68 +286,68 @@ function createLabelTextUi(ui, labelObject) {
   createLabelObjectBaseUi(ui, labelObject);
 
   ui
-    .add({text: labelObject.text.replace('\n', '\\n')}, 'text')
+    .add({ text: labelObject.text.replace('\n', '\\n') }, 'text')
     .onChange((text) => {
       labelObject.setText(text.replace('\\n', '\n'));
     });
 
   ui
-    .add({font: labelObject.style.font}, 'font')
+    .add({ font: labelObject.style.font }, 'font')
     .onChange((font) => {
-      labelObject.setStyle({font});
+      labelObject.setStyle({ font });
     });
 
   ui
-    .add({size: labelObject.style.size}, 'size')
+    .add({ size: labelObject.style.size }, 'size')
     .onChange((size) => {
-      labelObject.setStyle({size});
+      labelObject.setStyle({ size });
     });
 
   ui
-    .addColor({color: labelObject.style.color}, 'color')
+    .addColor({ color: labelObject.style.color }, 'color')
     .onChange((color) => {
-      labelObject.setStyle({color});
+      labelObject.setStyle({ color });
     });
 
   ui
-    .add({lineHeight: labelObject.style.lineHeight}, 'lineHeight')
+    .add({ lineHeight: labelObject.style.lineHeight }, 'lineHeight')
     .onChange((lineHeight) => {
-      labelObject.setStyle({lineHeight});
+      labelObject.setStyle({ lineHeight });
     });
 
   ui
-    .addColor({backgroundColor: labelObject.style.backgroundColor}, 'backgroundColor')
+    .addColor({ backgroundColor: labelObject.style.backgroundColor }, 'backgroundColor')
     .onChange((backgroundColor) => {
-      labelObject.setStyle({backgroundColor});
+      labelObject.setStyle({ backgroundColor });
     });
 
   ui
     .add(
-      {backgroundOpacity: labelObject.style.backgroundOpacity},
+      { backgroundOpacity: labelObject.style.backgroundOpacity },
       'backgroundOpacity',
       0,
       1,
     )
     .onChange((backgroundOpacity) => {
-      labelObject.setStyle({backgroundOpacity});
+      labelObject.setStyle({ backgroundOpacity });
     });
 
   ui
-    .add({backgroundPadding: labelObject.style.backgroundPadding}, 'backgroundPadding')
+    .add({ backgroundPadding: labelObject.style.backgroundPadding }, 'backgroundPadding')
     .onChange((backgroundPadding) => {
-      labelObject.setStyle({backgroundPadding});
+      labelObject.setStyle({ backgroundPadding });
     });
 
   ui
-    .add({backgroundRadius: labelObject.style.backgroundRadius}, 'backgroundRadius')
+    .add({ backgroundRadius: labelObject.style.backgroundRadius }, 'backgroundRadius')
     .onChange((backgroundRadius) => {
-      labelObject.setStyle({backgroundRadius});
+      labelObject.setStyle({ backgroundRadius });
     });
 
   ui
-    .add({quality: labelObject.style.quality}, 'quality')
+    .add({ quality: labelObject.style.quality }, 'quality')
     .onChange((quality) => {
-      labelObject.setStyle({quality});
+      labelObject.setStyle({ quality });
     });
 
   return ui;
@@ -375,7 +378,7 @@ function updateLevelOfDetailsUi() {
 
       const removeCell = document.createElement('td');
       const removeBtn = document.createElement('button');
-      removeBtn.innerText = "Remove";
+      removeBtn.innerText = 'Remove';
       removeBtn.onclick = () => {
         currentLabelObject.levelOfDetails.removeLevelState(startAt);
         updateLevelOfDetailsUi();
@@ -405,12 +408,12 @@ function createLabelText(mouseEvent) {
     return;
   }
 
-  let {object, position} = mouseEvent.intersects[0];
+  const { object, position } = mouseEvent.intersects[0];
 
   if (object.isSite || object.isBuilding || object.isFloor || object.isSpace) {
     const label = new AdsumWebMap.LabelTextObject({
       text: 'Hello world !\nThis is a multi-line one.',
-      offset: position
+      offset: position,
     });
     adsumWebMap.objectManager.addLabel(label, object);
   }
@@ -421,7 +424,7 @@ function createLabelImage(mouseEvent) {
     return;
   }
 
-  let {object, position} = mouseEvent.intersects[0];
+  const { object, position } = mouseEvent.intersects[0];
 
   if (object.isSite || object.isBuilding || object.isFloor || object.isSpace) {
     const label = new AdsumWebMap.LabelImageObject({
@@ -436,7 +439,7 @@ function deleteLabel(mouseEvent) {
     return;
   }
 
-  let {object} = mouseEvent.intersects[0];
+  const { object } = mouseEvent.intersects[0];
 
   if (object.isLabel) {
     adsumWebMap.objectManager.removeLabel(object);
@@ -447,22 +450,51 @@ function deleteLabel(mouseEvent) {
   }
 }
 
+async function goToLabel(mouseEvent) {
+  if (mouseEvent.intersects.length === 0) {
+    return;
+  }
+
+  const { object } = mouseEvent.intersects[0];
+
+  if (object.isLabel) {
+    const path = new AdsumWebMap.Path(
+      null,
+      adsumWebMap.wayfindingManager.locationRepository.getByAdsumObject(object),
+    );
+
+    await adsumWebMap.wayfindingManager.computePath(path);
+
+    for (const pathSection of path.getPathSections()) {
+      const pathSectionFloor = pathSection.ground === adsumWebMap.objectManager.site ? null : pathSection.ground;
+      // Set the currentFloor
+      if (pathSectionFloor !== adsumWebMap.sceneManager.getCurrentFloor()) {
+        await adsumWebMap.sceneManager.setCurrentFloor(pathSectionFloor);
+      }
+
+      await adsumWebMap.wayfindingManager.drawPathSection(pathSection);
+    }
+
+    adsumWebMap.wayfindingManager.removePath(path);
+  }
+}
+
 // Global try / catch to prevent errors
 try {
   // AdsumClientApi and AdsumWebMap namespaces are available globally
 
   // Create an entityManager using the API credentials (see AdsumClientAPI documentation for more details)
   entityManager = new AdsumClientApi.EntityManager({
-    "endpoint": "https://api.adsum.io",
-    "site": 322,
-    "username": "323-device",
-    "key": "343169bf805f8abd5fa71a4f529594a654de6afbac70a2d867a8b458c526fb7d"
+    endpoint: 'https://api.adsum.io',
+    site: 322,
+    username: '323-device',
+    key: '343169bf805f8abd5fa71a4f529594a654de6afbac70a2d867a8b458c526fb7d',
   });
 
   // Create the loader responsible for converting Adsum data into the 3D engine
   const adsumLoader = new AdsumWebMap.AdsumLoader({
     entityManager, // Give it in order to be used to consume REST API
-    deviceId: 323 // The device Id to use
+    deviceId: 323, // The device Id to use
   });
 
   // Create the Map instance
@@ -470,16 +502,15 @@ try {
     loader: adsumLoader, // The loader to use
     engine: {
       container: document.getElementById('adsum-web-map-container'), // The div DOMElement to insert the canvas into
-    }
+    },
   });
 
 
   // Init the Map
   adsumWebMap.init()
-    .then(() => {
+    .then(() =>
       // Start the rendering
-      return adsumWebMap.start();
-    })
+      adsumWebMap.start())
     .then(onStart, onError); // Add the resolve / reject callback
 } catch (e) {
   onError();
